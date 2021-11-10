@@ -2,7 +2,8 @@ import EventEmitter from "events";
 import { createReadStream } from "fs";
 import { Transform } from "stream";
 
-// Linux Kernel Joystick API Docs: https://www.kernel.org/doc/Documentation/input/joystick-api.txt
+// Linux Kernel Joystick API Docs:
+// https://www.kernel.org/doc/Documentation/input/joystick-api.txt
 
 /**
  * Slices the incoming stream into 8 byte chunks
@@ -52,6 +53,20 @@ const JS_EVENT_TYPE = {
     JS_EVENT_INIT: 0x80,
 };
 
+function getEvType(typeNo) {
+    if ((typeNo & JS_EVENT_TYPE.JS_EVENT_AXIS) === JS_EVENT_TYPE.JS_EVENT_AXIS) {
+        // joystick moved
+        return "AXIS";
+    }
+
+    if ((typeNo & JS_EVENT_TYPE.JS_EVENT_BUTTON) === JS_EVENT_TYPE.JS_EVENT_BUTTON) {
+        // button pressed/released
+        return "BUTTON";
+    }
+
+    return "unknown";
+}
+
 export class Joystick extends EventEmitter {
 
     mappingFn;
@@ -79,7 +94,7 @@ export class Joystick extends EventEmitter {
         const typeNo = buff.readUInt8(6);
         const number = buff.readUInt8(7);
 
-        const type = this.getEvType(typeNo);
+        const type = getEvType(typeNo);
 
         if (type === "unknown") {
             console.log("ev type unknown", typeNo);
@@ -105,26 +120,6 @@ export class Joystick extends EventEmitter {
             this.emit("update", this.mappingFn(ev));
         } else {
             this.emit("update", ev);
-        }
-    }
-
-    getEvType(typeNo) {
-        if ((typeNo & JS_EVENT_TYPE.JS_EVENT_AXIS) === JS_EVENT_TYPE.JS_EVENT_AXIS) {
-            // joystick moved
-            return "AXIS";
-        }
-
-        if ((typeNo & JS_EVENT_TYPE.JS_EVENT_BUTTON) === JS_EVENT_TYPE.JS_EVENT_BUTTON) {
-            // button pressed/released
-            return "BUTTON";
-        }
-
-        return "unknown";
-    }
-
-    getMappedName(type, number) {
-        if (this.mapping === "XBOX") {
-            
         }
     }
 }

@@ -47,8 +47,14 @@ function getButtonName(ev) {
 };
 
 export function xboxOneMapper(ev) {
-    return {
-        ...ev,
-        name: getButtonName(ev),
-    };
+    ev.name = getButtonName(ev);
+
+    if (
+        ev.name === "RIGHT_TRIGGER"
+        || ev.name === "LEFT_TRIGGER"
+    ) {
+        ev.value += 32767;
+    }
+
+    return ev;
 }
