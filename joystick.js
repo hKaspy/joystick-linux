@@ -1,48 +1,9 @@
 import EventEmitter from "events";
 import { createReadStream } from "fs";
-import { Transform } from "stream";
+import { JoystickStream } from "./joystick-stream.js";
 
 // Linux Kernel Joystick API Docs:
 // https://www.kernel.org/doc/Documentation/input/joystick-api.txt
-
-/**
- * Slices the incoming stream into 8 byte chunks
- */
-class JoystickStream extends Transform {
-
-    byteLength = 8;
-    cache = Buffer.alloc(0);
-
-    constructor() { super(); }
-
-    _transform(chunk, _encoding, callback) {
-
-        // fast-track if possible
-        if (this.cache.length === 0 && chunk.length === this.byteLength) {
-            this.push(chunk);
-            return callback(null);
-        }
-
-        const buff = this.cache.length === 0 ? chunk : Buffer.concat([this.cache, chunk]);
-        
-        if (buff.length < this.byteLength) {
-            this.cache = buff;
-            return callback(null);
-        }
-
-        let i = 0;
-
-        for (;i < buff.length; i += this.byteLength) {
-            this.push(buff.slice(i, i + this.byteLength));
-        }
-
-        if (i < buff.length) {
-            this.cache = buff.slice(i);
-        }
-
-        callback(null);
-    }
-}
 
 const JS_EVENT_TYPE = {
     // button pressed/released
@@ -53,7 +14,7 @@ const JS_EVENT_TYPE = {
     JS_EVENT_INIT: 0x80,
 };
 
-function getEvType(typeNo) {
+export function getEvType(typeNo) {
     if ((typeNo & JS_EVENT_TYPE.JS_EVENT_AXIS) === JS_EVENT_TYPE.JS_EVENT_AXIS) {
         // joystick moved
         return "AXIS";
@@ -65,6 +26,26 @@ function getEvType(typeNo) {
     }
 
     return "unknown";
+}
+
+export function parseEvent(buff) {
+    const time = buff.readUInt32LE(0);
+    const value = buff.readInt16LE(4);
+    const typeNo = buff.readUInt8(6);
+    const number = buff.readUInt8(7);
+
+    const type = getEvType(typeNo);
+
+    const isInitial = ((typeNo & JS_EVENT_TYPE.JS_EVENT_INIT) === JS_EVENT_TYPE.JS_EVENT_INIT);
+
+    return {
+        isInitial,
+        number,
+        time,
+        type,
+        typeNo,
+        value,
+    };
 }
 
 export class Joystick extends EventEmitter {
@@ -89,32 +70,17 @@ export class Joystick extends EventEmitter {
     }
 
     onData(buff) {
-        const time = buff.readUInt32LE(0);
-        const value = buff.readInt16LE(4);
-        const typeNo = buff.readUInt8(6);
-        const number = buff.readUInt8(7);
+        
+        const ev = parseEvent(buff);
 
-        const type = getEvType(typeNo);
-
-        if (type === "unknown") {
+        if (ev.type === "unknown") {
             console.log("ev type unknown", typeNo);
             return;
         }
 
-        const isInitial = ((typeNo & JS_EVENT_TYPE.JS_EVENT_INIT) === JS_EVENT_TYPE.JS_EVENT_INIT);
-
-        if (isInitial === true && this.includeInit !== true) {
+        if (ev.isInitial === true && this.includeInit !== true) {
             return;
         }
-
-        const ev = {
-            isInitial,
-            number,
-            time,
-            type,
-            typeNo,
-            value,
-        };
 
         if (typeof this.mappingFn === "function") {
             this.emit("update", this.mappingFn(ev));
@@ -123,5 +89,3 @@ export class Joystick extends EventEmitter {
         }
     }
 }
-
-export default Joystick;

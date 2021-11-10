@@ -4,7 +4,7 @@
   "description": "",
   "type": "module",
   "exports": {
-    ".": "./joystick.js",
+    ".": "./index.js",
     "./mappers": "./mappers/index.js"
   },
   "scripts": {
