@@ -123,3 +123,5 @@ export class Joystick extends EventEmitter {
         }
     }
 }
+
+export default Joystick;
