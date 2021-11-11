@@ -1,6 +1,6 @@
 # Joystick linux
 
-Thin wrapper around Linux's Joystick API. Zero dependencies!
+Thin wrapper around Linux's Joystick API.
 
 ## Installation
 
