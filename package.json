@@ -7,6 +7,11 @@
     ".": "./index.js",
     "./mappers": "./mappers/index.js"
   },
+  "files":[
+    "index.js",
+    "mappers",
+    "src"
+  ],
   "scripts": {
     "test": "mocha ./test/**/*.test.js",
     "test:coverage": "nyc npm run test"
