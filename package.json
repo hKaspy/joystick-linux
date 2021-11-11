@@ -14,8 +14,11 @@
   "keywords": [
     "joystick",
     "gamepad",
+    "controller",
     "linux",
-    "raspberry"
+    "rpi",
+    "raspberry",
+    "raspberrypi"
   ],
   "author": "hkaspy@gmail.com",
   "license": "MIT",
