@@ -43,7 +43,6 @@ export function parseEvent(buff) {
         number,
         time,
         type,
-        typeNo,
         value,
     };
 }
