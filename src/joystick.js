@@ -64,7 +64,8 @@ export class Joystick extends EventEmitter {
         this.mappingFn = options.mappingFn;
         this.includeInit = options.includeInit;
 
-        const fileStream = createReadStream(devicePath);
+        const fileStream = createReadStream(devicePath)
+            .on('error', e => this.emit('error', e));
         fileStream.pipe(new JoystickStream()).on('data', (b) => this.onData(b));
     }
 
