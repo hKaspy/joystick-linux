@@ -7,7 +7,7 @@
     ".": "./index.js",
     "./mappers": "./mappers/index.js"
   },
-  "files":[
+  "files": [
     "index.js",
     "mappers",
     "src"
