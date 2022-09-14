@@ -21,7 +21,13 @@ export class Joystick extends EventEmitter {
         this.includeInit = options.includeInit;
 
         const fileStream = createReadStream(devicePath)
-            .on('error', e => this.emit('error', e));
+            .on('error', (e) => {
+                if (e.code === 'ENODEV') {
+                    this.emit("disconnect");
+                } else {
+                    this.emit('error', e);
+                }
+            });
 
         fileStream
             .pipe(new JoystickStream())

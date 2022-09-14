@@ -10,7 +10,7 @@ npm install @hkaspy/joystick-linux
 
 ## Usage
 
-Tested on Node.js v14 LTS.
+Tested on Node.js v14 LTS and v16 LTS.
 
 ```js
 import Joystick from "@hkaspy/joystick-linux";
@@ -41,7 +41,15 @@ new Joystick(
 );
 ```
 
-### 'update' event
+## Events
+
+### `update`
+
+Emitted on each button press or exis value change.
+
+```js
+stick.on("update", (data) => console.log(data));
+```
 
 ```js
 {
@@ -59,7 +67,24 @@ new Joystick(
 }
 ```
 
-### mappers
+### `disconnect`
+
+Emitted when connection to the joystick is lost.
+
+```js
+stick.on("disconnect", () => console.log('disconnected'));
+```
+
+### `error`
+
+Emitted when there is an error with the joystick device (e.g. the specified path doesn't exist).
+
+```js
+stick.on("error", (err) => console.log('Error!', err));
+```
+
+
+## Mappers
 
 Include your custom mapping function to add more information to the event.
 
