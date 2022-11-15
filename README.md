@@ -45,7 +45,7 @@ new Joystick(
 
 ### `update`
 
-Emitted on each button press or exis value change.
+Emitted on each button press or axis value change.
 
 ```js
 stick.on("update", (data) => console.log(data));
