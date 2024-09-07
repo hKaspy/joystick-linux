@@ -88,7 +88,7 @@ stick.on("error", (err) => console.log('Error!', err));
 
 Include your custom mapping function to add more information to the event.
 
-See the included [xbox one controller mapper](./mappers/xbox-one.js) for example:
+See the included [xbox one controller mapper](./mappers/xbox-one.js) or [logitech f310 controller mapper](./mappers/logitech-f310.js)
 ```js
 import Joystick from "@hkaspy/joystick-linux";
 import { xboxOneMapper } from "@hkaspy/joystick-linux/mappers";
